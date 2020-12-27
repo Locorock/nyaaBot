@@ -32,8 +32,8 @@ def unfuckifyA(code, prefix, spaced):
 	if spaced:
 		snum += '"'
 		if code >= 10:
-			for i in range(0,10):
-				snum += '-"'+str(code)+str(i)+'"'
+			for i in range(0, 10):
+				snum += '-"' + str(code) + str(i) + '"'
 	return snum
 
 
@@ -83,9 +83,11 @@ def loopNomicon(client, nomicon):
 		if magnet is not None:
 			addMagnet(client, magnet)
 			print("'" + key + "' episode " + str(nomi["episode"]) + " found")
-			if nomi["episode"] != -1 and (nomi["episode"] <= nomi["max_episode"] or nomi["max_episode"] <= 0):
+			if nomi["episode"] >= 0:
 				nomi["episode"] = nomi["episode"] + 1
 			else:
+				to_remove += [key]
+			if nomi["episode"] > nomi["max_episode"]:
 				to_remove += [key]
 		else:
 			print("'" + key + "' episode " + str(nomi["episode"]) + " not found")
@@ -102,22 +104,22 @@ if __name__ == "__main__":
 			client = Client("http://" + config["qbit"]["qbit_ip"] + ":" + config["qbit"]["qbit_port"] + "/")
 			client.login(config["qbit"]["qbit_user"], config["qbit"]["qbit_pass"])
 		except:
-			print("QB not found, trying deluge")
 			try:
+				print("QB not found, trying deluge")
 				if config["deluge"]["deluge_pass"] == "":
-					with open(os.getenv('APPDATA')+r'\deluge\auth', mode="r") as file:
+					with open(os.getenv('APPDATA') + r'\deluge\auth', mode="r") as file:
 						auth = file.read()
 						password = auth.split(":")[1]
 						with open("config.json", mode="w") as file2:
 							config["deluge"]["deluge_pass"] = password
 							json.dump(config, file2, indent=4)
-				else:
-					client = DelugeRPCClient(config["deluge"]["deluge_ip"], config["deluge"]["deluge_port"],
+				client = DelugeRPCClient(config["deluge"]["deluge_ip"], config["deluge"]["deluge_port"],
 										 config["deluge"]["deluge_user"], config["deluge"]["deluge_pass"])
 				client.connect()
 				print("Connected to Deluge")
-			except:
+			except ConnectionRefusedError:
 				print("Deluge not found")
+				exit(0)
 
 	while True:
 		nomicon = loadNomicon()
