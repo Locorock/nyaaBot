@@ -1,0 +1,17 @@
+{
+    "general": {
+        "update_delay": 600
+    },
+    "deluge": {
+        "deluge_ip": "127.0.0.1",
+        "deluge_port": 58846,
+        "deluge_user": "localclient",
+        "deluge_pass": ""
+    },
+    "qbit": {
+        "qbit_ip": "127.0.0.1",
+        "qbit_port": "8080",
+        "qbit_user": "admin",
+        "qbit_pass": "adminadmin"
+    }
+}

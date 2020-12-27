@@ -1,0 +1,32 @@
+{
+    "jujutsu": {
+        "episode": 14,
+        "max_episode": -1,
+        "resolution": 720,
+        "group": "erai",
+        "prefix_0_before_10": true,
+        "space_episode_number": true,
+        "english_translated": true,
+        "except": ""
+    },
+    "assault lily bouquet": {
+        "episode": 13,
+        "max_episode": 12,
+        "resolution": 720,
+        "group": "erai",
+        "prefix_0_before_10": true,
+        "space_episode_number": true,
+        "english_translated": true,
+        "except": ""
+    },
+    "taiso": {
+        "episode": 12,
+        "max_episode": 13,
+        "resolution": 720,
+        "group": "erai",
+        "prefix_0_before_10": true,
+        "space_episode_number": true,
+        "english_translated": true,
+        "except": ""
+    }
+}
