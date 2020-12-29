@@ -5,6 +5,7 @@ import requests
 import time
 import pathlib
 import os
+import platform
 
 
 def grabMagnet(url):
@@ -67,30 +68,35 @@ def addMagnet(client, magnet):
 def loopNomicon(client, nomicon):
 	to_remove = []
 	for key in nomicon:
-		nomi = nomicon[key]
-		snum = ""
-		if nomi["episode"] != -1:
-			snum = unfuckifyA(nomi["episode"], nomi["prefix_0_before_10"], nomi["space_episode_number"])
-		keys = str(key).replace(" ", "+")
-		search = keys + "+" + nomi["group"] + "+" + str(nomi["resolution"]) + snum
-		if nomi["except"] != "":
-			search += "+-" + nomi["except"]
-		type_string = "0_0"
-		if nomi["english_translated"]:
-			type_string = "1_2"
-		url = 'https://nyaa.si/?f=0&c=' + type_string + '&q=' + search
-		magnet = grabMagnet(url)
-		if magnet is not None:
-			addMagnet(client, magnet)
-			print("'" + key + "' episode " + str(nomi["episode"]) + " found")
-			if nomi["episode"] >= 0:
-				nomi["episode"] = nomi["episode"] + 1
+		repeat = True
+		while(repeat):
+			time.sleep(5)
+			nomi = nomicon[key]
+			snum = ""
+			if nomi["episode"] != -1:
+				snum = unfuckifyA(nomi["episode"], nomi["prefix_0_before_10"], nomi["space_episode_number"])
+			keys = str(key).replace(" ", "+")
+			search = keys + "+" + nomi["group"] + "+" + str(nomi["resolution"]) + snum
+			if nomi["except"] != "":
+				search += "+-" + nomi["except"]
+			type_string = "0_0"
+			if nomi["english_translated"]:
+				type_string = "1_2"
+			url = 'https://nyaa.si/?f=0&c=' + type_string + '&q=' + search
+			magnet = grabMagnet(url)
+			if magnet is not None:
+				addMagnet(client, magnet)
+				print("'" + key + "' episode " + str(nomi["episode"]) + " found")
+				if nomi["episode"] >= 0:
+					nomi["episode"] = nomi["episode"] + 1
+					repeat = True
+				else:
+					to_remove += [key]
+				if nomi["episode"] > nomi["max_episode"]:
+					to_remove += [key]
 			else:
-				to_remove += [key]
-			if nomi["episode"] > nomi["max_episode"]:
-				to_remove += [key]
-		else:
-			print("'" + key + "' episode " + str(nomi["episode"]) + " not found")
+				print("'" + key + "' episode " + str(nomi["episode"]) + " not found")
+				repeat = False
 	for key in to_remove:
 		nomicon.pop(key)
 
@@ -107,12 +113,17 @@ if __name__ == "__main__":
 			try:
 				print("QB not found, trying deluge")
 				if config["deluge"]["deluge_pass"] == "":
-					with open(os.getenv('APPDATA') + r'\deluge\auth', mode="r") as file:
-						auth = file.read()
-						password = auth.split(":")[1]
-						with open("config.json", mode="w") as file2:
-							config["deluge"]["deluge_pass"] = password
-							json.dump(config, file2, indent=4)
+					password = ""
+					if platform.system() == "Linux":
+						with open(os.getenv('HOME')+"/.config/deluge/auth", mode="r") as file:
+							auth = file.read()
+					else:
+						with open(os.getenv('APPDATA') + r'\deluge\auth', mode="r") as file:
+							auth = file.read()
+					password = auth.split(":")[1]
+					with open("config.json", mode="w") as file2:
+						config["deluge"]["deluge_pass"] = password
+						json.dump(config, file2, indent=4)
 				client = DelugeRPCClient(config["deluge"]["deluge_ip"], config["deluge"]["deluge_port"],
 										 config["deluge"]["deluge_user"], config["deluge"]["deluge_pass"])
 				client.connect()

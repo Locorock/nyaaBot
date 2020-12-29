@@ -1,6 +1,7 @@
 {
     "general": {
-        "update_delay": 600
+        "update_delay": 600,
+        "update_delay_between": 1
     },
     "deluge": {
         "deluge_ip": "127.0.0.1",
